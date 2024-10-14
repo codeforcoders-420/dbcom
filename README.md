@@ -1,0 +1,2 @@
+# dbcom
+compare dbdata
