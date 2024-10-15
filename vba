@@ -40,10 +40,11 @@ Sub CompareSheets(sheet1Name As String, sheet2Name As String, resultSheetName As
         Exit Sub
     End If
 
-    ' Copy headers to the result sheet
+    ' Copy headers to the result sheet and add a column for "Source Sheet"
     For j = 1 To lastCol1
         wsResult.Cells(1, j).Value = ws1.Cells(1, j).Value
     Next j
+    wsResult.Cells(1, lastCol1 + 1).Value = "Source Sheet"
     
     ' Initialize variables
     resultRow = 2
@@ -58,6 +59,8 @@ Sub CompareSheets(sheet1Name As String, sheet2Name As String, resultSheetName As
                 For j = 1 To lastCol1
                     wsResult.Cells(resultRow, j).Value = ws1.Cells(i, j).Value
                 Next j
+                ' Add the source sheet name in the last column
+                wsResult.Cells(resultRow, lastCol1 + 1).Value = sheet1Name
                 resultRow = resultRow + 1
                 Exit For
             End If
