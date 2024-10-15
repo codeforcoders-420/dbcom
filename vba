@@ -9,7 +9,7 @@ End Sub
 Sub CompareSheets(sheet1Name As String, sheet2Name As String, resultSheetName As String)
     Dim ws1 As Worksheet, ws2 As Worksheet, wsResult As Worksheet
     Dim lastRow1 As Long, lastRow2 As Long, lastCol1 As Long, lastCol2 As Long
-    Dim i As Long, j As Long
+    Dim i As Long, j As Long, k As Long
     Dim diffFound As Boolean
     Dim resultRow As Long
 
@@ -56,9 +56,9 @@ Sub CompareSheets(sheet1Name As String, sheet2Name As String, resultSheetName As
             If ws1.Cells(i, j).Value <> ws2.Cells(i, j).Value Then
                 diffFound = True
                 ' If a difference is found, copy the entire row from Sheet1
-                For j = 1 To lastCol1
-                    wsResult.Cells(resultRow, j).Value = ws1.Cells(i, j).Value
-                Next j
+                For k = 1 To lastCol1
+                    wsResult.Cells(resultRow, k).Value = ws1.Cells(i, k).Value
+                Next k
                 ' Add the source sheet name in the last column
                 wsResult.Cells(resultRow, lastCol1 + 1).Value = sheet1Name
                 resultRow = resultRow + 1
