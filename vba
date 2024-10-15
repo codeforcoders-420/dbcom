@@ -42,8 +42,8 @@ Sub CompareSheets()
                 foundMatch = True
                 If count1 <> count2 Then
                     countMismatch = True
-                    Exit For ' No need to check further for this rawData
                 End If
+                Exit For ' No need to check further for this rawData
             End If
         Next j
         
@@ -71,9 +71,10 @@ Sub CompareSheets()
         
         For i = 2 To lastRow1
             rawData1 = ws1.Cells(i, 1).Value
+            count1 = ws1.Cells(i, 2).Value
             
-            ' If a match is found
-            If rawData2 = rawData1 Then
+            ' Check for existence of both Rawdata and Count
+            If rawData2 = rawData1 And count2 = count1 Then
                 foundMatch = True
                 Exit For
             End If
@@ -93,3 +94,4 @@ Sub CompareSheets()
         wsResult.Cells(2, 1).Value = "No Differences found. All Records Match"
     End If
 End Sub
+
