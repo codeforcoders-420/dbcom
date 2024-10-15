@@ -8,8 +8,8 @@ End Sub
 
 Sub CompareSheets(sheet1Name As String, sheet2Name As String, resultSheetName As String)
     Dim ws1 As Worksheet, ws2 As Worksheet, wsResult As Worksheet
-    Dim lastRow1 As Long, lastRow2 As Long, lastCol1 As Long, lastCol2 As Long
-    Dim i As Long, j As Long, k As Long
+    Dim lastRow1 As Long, lastRow2 As Long
+    Dim i As Long
     Dim diffFound As Boolean
     Dim resultRow As Long
 
@@ -28,45 +28,53 @@ Sub CompareSheets(sheet1Name As String, sheet2Name As String, resultSheetName As
         wsResult.Cells.Clear ' Clear previous results
     End If
     
-    ' Get the last rows and columns
+    ' Get the last rows for both sheets
     lastRow1 = ws1.Cells(ws1.Rows.Count, 1).End(xlUp).Row
     lastRow2 = ws2.Cells(ws2.Rows.Count, 1).End(xlUp).Row
-    lastCol1 = ws1.Cells(1, ws1.Columns.Count).End(xlToLeft).Column
-    lastCol2 = ws2.Cells(1, ws2.Columns.Count).End(xlToLeft).Column
     
-    ' Ensure the data range matches
-    If lastRow1 <> lastRow2 Or lastCol1 <> lastCol2 Then
-        wsResult.Cells(1, 1).Value = "Data structure mismatch between " & sheet1Name & " and " & sheet2Name
-        Exit Sub
-    End If
-
     ' Copy headers to the result sheet and add a column for "Source Sheet"
-    For j = 1 To lastCol1
-        wsResult.Cells(1, j).Value = ws1.Cells(1, j).Value
-    Next j
-    wsResult.Cells(1, lastCol1 + 1).Value = "Source Sheet"
+    wsResult.Cells(1, 1).Value = "Rawdata"
+    wsResult.Cells(1, 2).Value = "Count"
+    wsResult.Cells(1, 3).Value = "Source Sheet"
     
     ' Initialize variables
     resultRow = 2
     diffFound = False
     
-    ' Compare each row
+    ' Compare each row in Sheet1 against Sheet2
     For i = 2 To lastRow1 ' Assuming row 1 contains headers
-        For j = 1 To lastCol1
-            If ws1.Cells(i, j).Value <> ws2.Cells(i, j).Value Then
+        ' Check if the row in Sheet1 matches the corresponding row in Sheet2
+        If i <= lastRow2 Then
+            If ws1.Cells(i, 1).Value <> ws2.Cells(i, 1).Value Or ws1.Cells(i, 2).Value <> ws2.Cells(i, 2).Value Then
                 diffFound = True
-                ' If a difference is found, copy the entire row from Sheet1
-                For k = 1 To lastCol1
-                    wsResult.Cells(resultRow, k).Value = ws1.Cells(i, k).Value
-                Next k
-                ' Add the source sheet name in the last column
-                wsResult.Cells(resultRow, lastCol1 + 1).Value = sheet1Name
+                ' Log the difference from Sheet1
+                wsResult.Cells(resultRow, 1).Value = ws1.Cells(i, 1).Value ' Rawdata
+                wsResult.Cells(resultRow, 2).Value = ws1.Cells(i, 2).Value ' Count
+                wsResult.Cells(resultRow, 3).Value = sheet1Name
                 resultRow = resultRow + 1
-                Exit For
             End If
-        Next j
+        Else
+            ' Log the extra row from Sheet1 if Sheet2 has fewer rows
+            diffFound = True
+            wsResult.Cells(resultRow, 1).Value = ws1.Cells(i, 1).Value
+            wsResult.Cells(resultRow, 2).Value = ws1.Cells(i, 2).Value
+            wsResult.Cells(resultRow, 3).Value = sheet1Name & " (Extra Row)"
+            resultRow = resultRow + 1
+        End If
     Next i
-    
+
+    ' Compare each row in Sheet2 against Sheet1 to find any unmatched rows from Sheet2
+    For i = 2 To lastRow2 ' Assuming row 1 contains headers
+        If i > lastRow1 Or (ws1.Cells(i, 1).Value <> ws2.Cells(i, 1).Value Or ws1.Cells(i, 2).Value <> ws2.Cells(i, 2).Value) Then
+            diffFound = True
+            ' Log the difference from Sheet2
+            wsResult.Cells(resultRow, 1).Value = ws2.Cells(i, 1).Value ' Rawdata
+            wsResult.Cells(resultRow, 2).Value = ws2.Cells(i, 2).Value ' Count
+            wsResult.Cells(resultRow, 3).Value = sheet2Name
+            resultRow = resultRow + 1
+        End If
+    Next i
+
     ' If no differences found, write the message
     If Not diffFound Then
         wsResult.Cells(1, 1).Value = "No Differences found, All Records Match"
